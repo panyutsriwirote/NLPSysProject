@@ -35,9 +35,9 @@ How did it go?  + Interpret results.
 ### Model comparison
 |      Model      |   UAS   |   LAS   |
 |-----------------|---------|---------|
-|Wangchan-Token-5 |  78.02  |  71.39  |
+|Wangchan-Token-5 |**78.02**|**71.39**|
 |Wangchan-Token-10|  74.96  |  69.69  |
-|Thai Biaffine    |**82.17**|**75.70**|
+|Thai Biaffine    |  75.79  |  70.38  |
 
 ## Conclusion
 - What task? What did we do?

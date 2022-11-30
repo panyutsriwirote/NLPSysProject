@@ -24,7 +24,7 @@ Explain your model here how it works.
 |  good |    60%    |
 |  bad  |    40%    |
 
-## Experiment setup
+## Experimental setup
 - Which pre-trained model? How did you pretrain embeddings?
 - Computer. How long?
 - Hyperparameter tuning? Dropout? How many epochs?
@@ -33,12 +33,11 @@ Explain your model here how it works.
 How did it go?  + Interpret results.
 
 ### Model comparison
-|         Model         |   UAS   |   LAS   |
-|-----------------------|---------|---------|
-|Wangchan-Token-5       |**78.02**|**71.39**|
-|Wangchan-Token-10      |  74.96  |  69.69  |
-|Thai Biaffine (Default)|  75.79  |  70.38  |
-<!-- Wangchan-Token-10's UAS once reached 77.40 but failed to be reproduced -->
+|      Model      |   UAS   |   LAS   |
+|-----------------|---------|---------|
+|Wangchan-Token-5 |  78.02  |  71.39  |
+|Wangchan-Token-10|  74.96  |  69.69  |
+|Thai Biaffine    |**82.17**|**75.70**|
 
 ## Conclusion
 - What task? What did we do?

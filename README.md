@@ -7,12 +7,17 @@
 - Summarize your results
 
 ## Our Model
-Explain your model here how it works.
+Our dependency parser consists of 2 token classification sub-models, **head classifier** and **label classifier**, that use feedforward neural network (FFNN) to independently predict head position and dependency label for each token in a sentence using contextual token embeddings obtained from a pre-trained encoder. Input to both models consists only of sequences of tokens. Output is **relative head positions** for head classifier and **dependency labels** for label classifier.
 
-- Input is ...
-- Output is ...
-- Model description
-- Equation as necessary e.g. $\alpha_3$
+**Relative head position** is defined as the distance and direction from the token to its head token. Negative distance means the head token is to the left and vice versa. Said definition can be mathematically formulated as
+
+$$ RelHeadPos = HeadPos - TokenPos $$
+
+For root tokens, which have no heads, we define their relative head positions to be **0**.
+
+Since **relative head position** can theoretically be any integer, creating an infinitely-large tagset and making the model untrainable, we have to compromise by having a **window length** outside of which the model will label the head position as "out of range", a label that will be counted as incorrect in evaluation.
+
+For comparison, we train 2 head classifier sub-models, one has a window length of 5 tokens to the left and right while another has 10.
 
 ## Dataset
 - The datasets we use were devided into two sections. The first section is the set of 50 sentences including 560 tokens that we recreate and annotate it using the universal independency annotation guidelines from [Thai Dependency Tree Bank](https://www.arts.chula.ac.th/ling/resources/publications/). The second section is the set of 1000 annotated sentences with 22322 tokens from [THAI PUD](https://universaldependencies.org/treebanks/th_pud/index.html).
@@ -47,9 +52,14 @@ head index-token id = relative head position// relation
 |   10|  0 |
 |   out of range|  2 |
 ## Experimental setup
-- Which pre-trained model? How did you pretrain embeddings?
-- Computer. How long?
-- Hyperparameter tuning? Dropout? How many epochs?
+We use pre-trained WangchanBERTa ([airesearch/wangchanberta-base-att-spm-uncased](https://huggingface.co/airesearch/wangchanberta-base-att-spm-uncased)) as token encoder. Both sub-models in our parser are automatically generated using Huggingface's AutoModelForTokenClassification class. We train each sub-model for 50 epochs, which are enough for the models' accuracy to stabilize.
+
+Each parser is evaluated using **unlabeled attachment score (UAS)** and **labeled attachment score (LAS)**, which are defined as
+
+$$ UAS = {number\ of\ head\ correct\ tokens \over number\ of\ tokens} $$
+$$ LAS = {number\ of\ head\ and\ label\ correct\ tokens \over number\ of\ tokens} $$
+
+For comparison, we also train and evaluate a [Deep Biaffine Dependency Parser](https://github.com/JoesSattes/Thai-Biaffine-Dependency-Parsing) on the same dataset.
 
 ## Results
 How did it go?  + Interpret results.

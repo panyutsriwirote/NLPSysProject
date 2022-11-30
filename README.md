@@ -57,6 +57,7 @@ We use pre-trained WangchanBERTa ([airesearch/wangchanberta-base-att-spm-uncased
 Each parser is evaluated using **unlabeled attachment score (UAS)** and **labeled attachment score (LAS)**, which are defined as
 
 $$ UAS = {number\ of\ head\ correct\ tokens \over number\ of\ tokens} $$
+
 $$ LAS = {number\ of\ head\ and\ label\ correct\ tokens \over number\ of\ tokens} $$
 
 For comparison, we also train and evaluate a [Deep Biaffine Dependency Parser](https://github.com/JoesSattes/Thai-Biaffine-Dependency-Parsing) on the same dataset.

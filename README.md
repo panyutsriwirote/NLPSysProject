@@ -122,7 +122,7 @@ For comparison, we also train and evaluate a Deep Biaffine Dependency Parser on 
 |----------------|---------|---------|
 |Wangchan-5Token |**78.02**|**71.39**|
 |Wangchan-10Token|  74.96  |  69.69  |
-|Deep Biaffine   |  75.79  |  70.38  |
+|Deep Biaffine   |  76.66  |  70.56  |
 
 Our results show that simple token classification models that use WangchanBERTa as token encoder are capable of achieving competitive or even higher UAS and LAS compared to Deep Biaffine, which is a graph-based model.
 

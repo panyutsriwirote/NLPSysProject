@@ -139,3 +139,7 @@ Nevertheless, even if a larger dataset can be obtained, our models would still h
 - Our results show that such models are capable of achieving competitive or even higher UAS and LAS compared to graph-based Deep Biaffine model.
 - However, our models suffer from low accuracy in longer-range dependencies and might require large dataset to overcome a lack of training samples.
 - Our models also have an inherent guaranteed error that must be tuned to be within an acceptable margin.
+
+## Author
+- Panyut Sriwirote 6340138322
+- Apimon Jitaksorn 6340261822

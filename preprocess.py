@@ -71,7 +71,7 @@ for i in range(len(set(combined["tree_id"]))):
     assert len(set(sentence["corpus"])) == 1, f"Sentence comes from 2 different corpora: {i}"
     tree = {}
     tree["tokens"] = sentence["token"].to_list()
-    tree["heads"] = sentence["rel_head"].apply(lambda rel_head: str(rel_head) if -LIMIT <= rel_head <= LIMIT else "OUT_OF_RANGE").to_list()
+    tree["rel_heads"] = sentence["rel_head"].apply(lambda rel_head: str(rel_head) if -LIMIT <= rel_head <= LIMIT else "OUT_OF_RANGE").to_list()
     tree["dep_types"] = sentence["dep_type"].to_list()
     corpus = sentence["corpus"].iloc[0]
     tree["corpus"] = corpus

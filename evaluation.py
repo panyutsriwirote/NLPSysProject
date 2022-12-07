@@ -83,7 +83,7 @@ def evaluate(head_classifier, head_label_list: list, head_dataset, label_classif
         if h_pred != "OUT_OF_RANGE" and h_pred == h_gold and l_pred == l_gold:
             correct += 1
         total += 1
-    LAS = correct / total
+    LAS = (correct / total) * 100
 
     return UAS, LAS
 

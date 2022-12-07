@@ -227,7 +227,7 @@ def predict_define(args):
     to_conllu(word_all, pos_all, head_all, label_predall)
 
 def to_conllu(word_sen, pos_sen, head_sen, label_predsen):
-    with open("prediction.conll", "w", encoding="utf-8") as out:
+    with open("prediction.conllu", "w", encoding="utf-8") as out:
         for i in range(len(word_sen)):
             for idx, word in enumerate(word_sen[i]):
                 # print(idx)

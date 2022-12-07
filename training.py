@@ -5,9 +5,9 @@ from ast import literal_eval
 
 def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, label_name: str, label_list: list, window_length: int, encoder: str, batch_size: int, num_epoch: int, save_strategy: str):
 
-    train["tokens"] = train["tokens"].apply(literal_eval)
-    dev["tokens"] = dev["tokens"].apply(literal_eval)
-    test["tokens"] = test["tokens"].apply(literal_eval)
+    train = train.copy()
+    dev = dev.copy()
+    test = test.copy()
 
     if label_name == "rel_heads":
         labelize = lambda x: [h if h == "OUT_OF_RANGE" or -window_length <= int(h) <= window_length else "OUT_OF_RANGE" for h in literal_eval(x)]
@@ -15,11 +15,18 @@ def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame,
         dev["rel_heads"] = dev["rel_heads"].apply(labelize)
         test["rel_heads"] = test["rel_heads"].apply(labelize)
     elif label_name == "dep_types":
+        train = train[train["corpus"] == "th_pud"]
+        dev = dev[dev["corpus"] == "th_pud"]
+        test = test[test["corpus"] == "th_pud"]
         train["dep_types"] = train["dep_types"].apply(literal_eval)
         dev["dep_types"] = dev["dep_types"].apply(literal_eval)
         test["dep_types"] = test["dep_types"].apply(literal_eval)
     else:
         raise Exception(f"Invalid label name: {label_name}; Expect 'rel_heads' or 'dep_types'")
+    
+    train["tokens"] = train["tokens"].apply(literal_eval)
+    dev["tokens"] = dev["tokens"].apply(literal_eval)
+    test["tokens"] = test["tokens"].apply(literal_eval)
 
     train = train[["tokens", label_name]].to_dict(orient="series")
     dev = dev[["tokens", label_name]].to_dict(orient="series")
@@ -40,7 +47,7 @@ def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame,
     tokenized_datasets = data.map(lambda x: tokenize_and_align_labels(x, tokenizer, label_name), batched=True)
 
     label_list = data['train'].features[label_name].feature.names
-    model = AutoModelForTokenClassification.from_pretrained("airesearch/wangchanberta-base-att-spm-uncased", num_labels=len(label_list))
+    model = AutoModelForTokenClassification.from_pretrained(encoder, num_labels=len(label_list))
     args = TrainingArguments(
         f"wangchan-{window_length}token",
         evaluation_strategy = "epoch",

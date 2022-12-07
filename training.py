@@ -49,7 +49,7 @@ def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame,
     label_list = data['train'].features[label_name].feature.names
     model = AutoModelForTokenClassification.from_pretrained(encoder, num_labels=len(label_list))
     args = TrainingArguments(
-        f"wangchan-{window_length}token",
+        f"wangchan-head-{window_length}token" if label_name == "rel_heads" else "wangchan-label",
         evaluation_strategy = "epoch",
         learning_rate=2e-5,
         per_device_train_batch_size=batch_size,

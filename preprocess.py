@@ -1,3 +1,10 @@
+from sys import exit
+
+answer = input("This will re-split the dataset and create a new train/dev/test distribution\nAre you sure you want to continue? (y/n): ")
+if answer.lower() != "y":
+    print("Exiting...")
+    exit()
+
 import re, csv, pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -104,12 +111,12 @@ train = (data[i] for i in range(len(data)) if i in train_id)
 dev = (data[i] for i in range(len(data)) if i in dev_id)
 test = (data[i] for i in range(len(data)) if i in test_id)
 
-with open("deep_biaffine/train.conllu", "w", encoding="utf-8") as train_set:
+with open("deep_biaffine/data/train.conll", "w", encoding="utf-8") as train_set:
     train_set.write("\n\n".join(train))
     train_set.write("\n\n")
-with open("deep_biaffine/dev.conllu", "w", encoding="utf-8") as dev_set:
+with open("deep_biaffine/data/dev.conll", "w", encoding="utf-8") as dev_set:
     dev_set.write("\n\n".join(dev))
     dev_set.write("\n\n")
-with open("deep_biaffine/test.conllu", "w", encoding="utf-8") as test_set:
+with open("deep_biaffine/data/test.conll", "w", encoding="utf-8") as test_set:
     test_set.write("\n\n".join(test))
     test_set.write("\n\n")

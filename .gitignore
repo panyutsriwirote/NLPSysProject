@@ -1,1 +1,6 @@
-Thai-Biaffine
+deep_biaffine/__pycache__
+deep_biaffine/checkpoints
+deep_biaffine/img
+deep_biaffine/vocab
+deep_biaffine/log
+deep_biaffine/prediction.conll

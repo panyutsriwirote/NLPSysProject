@@ -1,26 +1,48 @@
 import pandas as pd, numpy as np
-from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, DataCollatorForTokenClassification
+from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer, DataCollatorForTokenClassification
 from datasets import load_metric, Dataset, DatasetDict, Features, Sequence, ClassLabel, Value
+from ast import literal_eval
 
-def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, label_name: str, label_list: list[str], limit: int, tokenizer, batch_size: int, num_epoch: int, save_strategy: str):
+def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, label_name: str, label_list: list, window_length: int, encoder: str, batch_size: int, num_epoch: int, save_strategy: str):
+
+    train["tokens"] = train["tokens"].apply(literal_eval)
+    dev["tokens"] = dev["tokens"].apply(literal_eval)
+    test["tokens"] = test["tokens"].apply(literal_eval)
+
+    if label_name == "rel_heads":
+        labelize = lambda x: [h if h == "OUT_OF_RANGE" or -window_length <= int(h) <= window_length else "OUT_OF_RANGE" for h in literal_eval(x)]
+        train["rel_heads"] = train["rel_heads"].apply(labelize)
+        dev["rel_heads"] = dev["rel_heads"].apply(labelize)
+        test["rel_heads"] = test["rel_heads"].apply(labelize)
+    elif label_name == "dep_types":
+        train["dep_types"] = train["dep_types"].apply(literal_eval)
+        dev["dep_types"] = dev["dep_types"].apply(literal_eval)
+        test["dep_types"] = test["dep_types"].apply(literal_eval)
+    else:
+        raise Exception(f"Invalid label name: {label_name}; Expect 'rel_heads' or 'dep_types'")
+
     train = train[["tokens", label_name]].to_dict(orient="series")
     dev = dev[["tokens", label_name]].to_dict(orient="series")
     test = test[["tokens", label_name]].to_dict(orient="series")
+
     features = Features({
         "tokens": Sequence(Value('string')),
         label_name: Sequence(feature=ClassLabel(names=label_list))
     })
+
     data = DatasetDict({
         "train": Dataset.from_dict(train, features=features), 
         "dev": Dataset.from_dict(dev, features=features),
         "test": Dataset.from_dict(test, features=features)
     })
+
+    tokenizer = AutoTokenizer.from_pretrained(encoder)
     tokenized_datasets = data.map(lambda x: tokenize_and_align_labels(x, tokenizer, label_name), batched=True)
+
     label_list = data['train'].features[label_name].feature.names
     model = AutoModelForTokenClassification.from_pretrained("airesearch/wangchanberta-base-att-spm-uncased", num_labels=len(label_list))
-
     args = TrainingArguments(
-        f"wangchan-{limit}token",
+        f"wangchan-{window_length}token",
         evaluation_strategy = "epoch",
         learning_rate=2e-5,
         per_device_train_batch_size=batch_size,
@@ -34,6 +56,7 @@ def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame,
     )
     data_collator = DataCollatorForTokenClassification(tokenizer)
     metric = load_metric("seqeval")
+
     CLASSIFIER = Trainer(
         model,
         args,
@@ -44,7 +67,8 @@ def train_classifier(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame,
         compute_metrics=lambda x: compute_metrics(x, metric, label_list)
     )
     CLASSIFIER.train()
-    CLASSIFIER.save_model()
+    # CLASSIFIER.save_model()
+    return CLASSIFIER
 
 def tokenize_and_align_labels(d, tokenizer, feature_to_align: str):
     label_all_tokens = True

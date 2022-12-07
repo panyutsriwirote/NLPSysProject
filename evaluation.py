@@ -2,6 +2,8 @@ import numpy as np, pandas as pd
 from sklearn.metrics import classification_report
 from ast import literal_eval
 from datasets import Dataset, DatasetDict, Features, Sequence, ClassLabel, Value
+from transformers import AutoTokenizer
+from training import tokenize_and_align_labels
 
 def evaluate(head_classifier, head_label_list: list, head_dataset, label_classifier, dep_type_list: list, label_dataset):
 
@@ -85,7 +87,7 @@ def evaluate(head_classifier, head_label_list: list, head_dataset, label_classif
 
     return UAS, LAS
 
-def create_eval_dataset(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, rel_head_eval, rel_head_list: list, dep_type_list: list):
+def create_eval_dataset(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, rel_head_eval, rel_head_list: list, dep_type_list: list, encoder: str):
 
     train = train.copy()
     dev = dev.copy()
@@ -122,6 +124,9 @@ def create_eval_dataset(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFra
         "test": Dataset.from_dict(head_test, features=features)
     })
 
+    tokenizer = AutoTokenizer.from_pretrained(encoder)
+    head_dataset = head_dataset.map(lambda x: tokenize_and_align_labels(x, tokenizer, "rel_heads"), batched=True)
+
     label_train = train[["tokens", "dep_types"]].to_dict(orient="series")
     label_dev = dev[["tokens", "dep_types"]].to_dict(orient="series")
     label_test = test[["tokens", "dep_types"]].to_dict(orient="series")
@@ -136,5 +141,8 @@ def create_eval_dataset(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFra
         "dev": Dataset.from_dict(label_dev, features=features),
         "test": Dataset.from_dict(label_test, features=features)
     })
+
+    tokenizer = AutoTokenizer.from_pretrained(encoder)
+    label_dataset = label_dataset.map(lambda x: tokenize_and_align_labels(x, tokenizer, "dep_types"), batched=True)
 
     return head_dataset, label_dataset
